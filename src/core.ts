@@ -4,33 +4,34 @@ const exec = util.promisify(child_process.exec);
 export async function getCount(
   path: string
 ): Promise<[number, number] | undefined> {
-  const cmd = `git diff --shortstat`;
-  const res = await exec(cmd, {
-    cwd: path,
-  });
-  const resStr = res.stdout;
-  const insertionReg = /(\d+) insertions/;
-  const deletionReg = /(\d+) deletion/;
-  let insertCount = NaN;
-  let deleteCount = NaN;
-  resStr.replace(insertionReg, (_match: string, p1: string | undefined) => {
-    const count: string = p1 ? p1.trim() : '';
-    if (count) {
-      insertCount = Number.isNaN(+count) ? NaN : +count;
-    }
-    return `$$`;
-  });
-  resStr.replace(deletionReg, (_match: string, p1: string | undefined) => {
-    const count: string = p1 ? p1.trim() : '';
-    if (count) {
-      deleteCount = Number.isNaN(+count) ? NaN : +count;
-    }
-    return `$$`;
-  });
+  try {
+    const cmd = `git diff --shortstat`;
+    const res = await exec(cmd, {
+      cwd: path,
+    });
+    const resStr = res.stdout;
+    const insertionReg = /(\d+) insertion/;
+    const deletionReg = /(\d+) deletion/;
 
-  if (Number.isNaN(insertCount) || Number.isNaN(deleteCount)) {
+    const extract = (reg: RegExp): number | typeof NaN => {
+      const list = reg.exec(resStr);
+      if (!list) {
+        return NaN;
+      }
+      const count: string = list[1].trim();
+      return Number.isNaN(+count) ? NaN : +count;
+    };
+    const counts = [insertionReg, deletionReg]
+      .map(reg => {
+        return extract(reg);
+      })
+      .filter(v => !Number.isNaN(v));
+    if (counts.length !== 2) {
+      return undefined;
+    } else {
+      return counts as [number, number];
+    }
+  } catch {
     return undefined;
-  } else {
-    return [insertCount, deleteCount];
   }
 }
