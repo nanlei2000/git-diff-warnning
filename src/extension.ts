@@ -1,27 +1,27 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as path from 'path';
+import { getCount } from './core';
+export function activate() {
+  const status = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left,
+    9999
+  );
+  const rootPath = vscode.workspace.workspaceFolders![0].uri.path;
+  const pattern = new vscode.RelativePattern(rootPath, '**/*');
+  const watcher = vscode.workspace.createFileSystemWatcher(pattern);
+  watcher.onDidChange(() => {
+    console.log(1);
+    updateStatus();
+  });
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "git-diff-warnning" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World!');
-	});
-
-	context.subscriptions.push(disposable);
+  async function updateStatus() {
+    const res = await getCount(rootPath);
+    if (res) {
+      status.text = `${res[0]} \$(diff-added) ${res[1]} \$(diff-removed)`;
+    }
+    status.show();
+  }
+  updateStatus();
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {}
