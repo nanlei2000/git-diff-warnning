@@ -15,13 +15,49 @@ export function activate() {
   watcher.onDidChange(() => {
     updateStatus();
   });
+  vscode.workspace.onDidChangeConfiguration(() => {
+    updateStatus();
+  });
   updateStatus();
+  const getCountText = (count: number, maxCount: number | null): string => {
+    if (maxCount && +maxCount < count) {
+      return count + '!';
+    } else {
+      return count + '';
+    }
+  };
+  function getMaxCountFromConfig(): number[] {
+    let config = vscode.workspace.getConfiguration('diffWarning');
+    const maxCountEachType = config
+      .get<(number | null)[]>('maxCountEachType')!
+      .map(v => (v ? +v : Infinity));
+    return maxCountEachType;
+  }
+
   async function updateStatus() {
+    const maxCountEachType = getMaxCountFromConfig();
     const res = await getCount(rootPath);
     if (res) {
-      status.text = `${res[0]} $(diff-added) ${res[1]} $(diff-removed)`;
+      status.text = `$(file) ${getCountText(
+        res.modifiedFileCount,
+        maxCountEachType[0]
+      )} $(diff-added) ${getCountText(
+        res.insertCount,
+        maxCountEachType[1]
+      )} $(diff-removed) ${getCountText(res.deleteCount, maxCountEachType[2])}`;
+      status.tooltip = res.stdout;
+      if (
+        [res.modifiedFileCount, res.insertCount, res.deleteCount].some(
+          (v, index) => v > maxCountEachType[index]
+        )
+      ) {
+        status.color = '#f00';
+      } else {
+        status.color = '#fff';
+      }
       status.show();
     } else {
+      status.hide();
       console.warn(`得不到count!`);
     }
   }

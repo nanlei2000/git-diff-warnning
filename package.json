@@ -14,10 +14,20 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
+    "configuration": [
       {
-        "command": "extension.helloWorld",
-        "title": "Hello World"
+        "title": "Diff Warnings configuration",
+        "properties": {
+          "diffWarning.maxCountEachType": {
+            "type": "array",
+            "default": [
+              null,
+              200,
+              200
+            ],
+            "description": "Max counts for changed files,insertions,and deletions.Set `null` to ignore specific one."
+          }
+        }
       }
     ]
   },
