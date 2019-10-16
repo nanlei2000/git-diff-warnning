@@ -11,13 +11,12 @@ type ParsedRes = {
 export async function getCount(path: string): Promise<ParsedRes | undefined> {
   try {
     const cmd = `git diff --shortstat`;
-    const res = await exec(cmd, {
+    const { stdout } = await exec(cmd, {
       cwd: path,
     });
     // https://github.com/git/git/blob/108b97dc372828f0e72e56bbb40cae8e1e83ece6/diff.c#L2588
     // 1 file changed, 1 deletion(-)
-    const resStr = res.stdout;
-    if (!resStr) {
+    if (!stdout) {
       return undefined;
     }
     const modifiedFileReg = /(\d+) file/;
@@ -25,7 +24,7 @@ export async function getCount(path: string): Promise<ParsedRes | undefined> {
     const deletionReg = /(\d+) deletion/;
 
     const extract = (reg: RegExp): number => {
-      const list = reg.exec(resStr);
+      const list = reg.exec(stdout);
       if (!list) {
         return 0;
       }
@@ -34,7 +33,7 @@ export async function getCount(path: string): Promise<ParsedRes | undefined> {
 
     const counts = [modifiedFileReg, insertionReg, deletionReg].map(extract);
     const parsedRes: ParsedRes = {
-      stdout: resStr,
+      stdout: stdout,
       modifiedFileCount: counts[0],
       insertCount: counts[1],
       deleteCount: counts[2],

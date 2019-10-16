@@ -19,8 +19,8 @@ export function activate() {
     updateStatus();
   });
   updateStatus();
-  const getCountText = (count: number, maxCount: number | null): string => {
-    if (maxCount && +maxCount < count) {
+  const getCountText = (count: number, maxCount: number): string => {
+    if (maxCount < count) {
       return count + '!';
     } else {
       return count + '';
@@ -30,7 +30,7 @@ export function activate() {
     let config = vscode.workspace.getConfiguration('diffWarning');
     const maxCountEachType = config
       .get<(number | null)[]>('maxCountEachType')!
-      .map(v => (v ? +v : Infinity));
+      .map(v => (v !== null ? +v : Infinity));
     return maxCountEachType;
   }
 
@@ -58,7 +58,7 @@ export function activate() {
       status.show();
     } else {
       status.hide();
-      console.warn(`得不到count!`);
+      console.warn(`Can't get diff result`);
     }
   }
 }
