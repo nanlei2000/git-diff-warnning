@@ -14,35 +14,32 @@ export async function getCount(path: string): Promise<ParsedRes | undefined> {
     const res = await exec(cmd, {
       cwd: path,
     });
+    // https://github.com/git/git/blob/108b97dc372828f0e72e56bbb40cae8e1e83ece6/diff.c#L2588
+    // 1 file changed, 1 deletion(-)
     const resStr = res.stdout;
+    if (!resStr) {
+      return undefined;
+    }
     const modifiedFileReg = /(\d+) file/;
     const insertionReg = /(\d+) insertion/;
     const deletionReg = /(\d+) deletion/;
 
-    const extract = (reg: RegExp): number | typeof NaN => {
+    const extract = (reg: RegExp): number => {
       const list = reg.exec(resStr);
       if (!list) {
-        return NaN;
+        return 0;
       }
-      const count: string = list[1].trim();
-      return Number.isNaN(+count) ? NaN : +count;
+      return +list[1];
     };
-    const counts = [modifiedFileReg, insertionReg, deletionReg]
-      .map(reg => {
-        return extract(reg);
-      })
-      .filter(v => !Number.isNaN(v));
-    if (counts.length !== 3) {
-      return undefined;
-    } else {
-      const parsedRes: ParsedRes = {
-        stdout: resStr,
-        modifiedFileCount: counts[0],
-        insertCount: counts[1],
-        deleteCount: counts[2],
-      };
-      return parsedRes;
-    }
+
+    const counts = [modifiedFileReg, insertionReg, deletionReg].map(extract);
+    const parsedRes: ParsedRes = {
+      stdout: resStr,
+      modifiedFileCount: counts[0],
+      insertCount: counts[1],
+      deleteCount: counts[2],
+    };
+    return parsedRes;
   } catch {
     return undefined;
   }
