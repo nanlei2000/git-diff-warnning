@@ -1,7 +1,7 @@
 {
-  "name": "git-diff-warnning",
-  "displayName": "git-diff-warnning",
-  "description": "warn if git diff line count is too big",
+  "name": "git-diff-warning",
+  "displayName": "Git Diff Warning",
+  "description": "Warn if git diff line count is too big",
   "publisher": "nanlei",
   "version": "0.0.1",
   "engines": {
@@ -17,16 +17,17 @@
   "contributes": {
     "configuration": [
       {
-        "title": "Diff Warnings configuration",
+        "title": "Git Diff Warning Configuration",
         "properties": {
-          "diffWarning.maxCountEachType": {
+          "gitDiffWarning.maxCountEachTypeAndSum": {
             "type": "array",
             "default": [
               null,
               200,
+              200,
               200
             ],
-            "description": "Max counts for changed files,insertions,and deletions.Set `null` to ignore specific one."
+            "description": "Max counts for 'changed files','insertions','deletions',and 'insertions deletions sum'.Set `null` to ignore specific one."
           }
         }
       }
