@@ -3,7 +3,7 @@
     "displayName": "Git Diff Warning",
     "description": "Warn if git diff line count is too big",
     "publisher": "nanlei2000",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "engines": {
         "vscode": "^1.39.0"
     },
@@ -57,5 +57,6 @@
     },
     "bugs": {
         "url": "https://github.com/nanlei2000/git-diff-warnning/issues"
-    }
+    },
+    "icon": "media/icon.png"
 }

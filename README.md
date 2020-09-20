@@ -1,11 +1,11 @@
 # README
 
+![screenshot](media/desc.png)
 ## Features
-
 - Display `git diff` result in editor status bar realtime
 - Warn if git diff line count is too big
 
-## setting
+## Setting
 ```json
 {
 // Max counts for 'changed files','insertions','deletions',and 'insertions deletions sum'.Set `null` to ignore specific one.
@@ -17,4 +17,4 @@
   ]
 }
 ```
-![screenshot](media/desc.png)
+
