@@ -2,8 +2,8 @@
     "name": "git-diff-warning",
     "displayName": "Git Diff Warning",
     "description": "Warn if git diff line count is too big",
-    "publisher": "nanlei",
-    "version": "0.0.1",
+    "publisher": "nanlei2000",
+    "version": "1.0.1",
     "engines": {
         "vscode": "^1.39.0"
     },
