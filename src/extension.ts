@@ -68,7 +68,7 @@ export function activate() {
         status.color = '#f00';
       } else {
         isNeedWarn = false;
-        status.color = '#fff';
+        status.color = 'unset';
       }
       status.show();
     } else {
