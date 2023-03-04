@@ -79,7 +79,11 @@ export function activate() {
       )
         .map((v, i) => `${v[0]} ${getCountText(v[1], maxCountEachType[i])}`)
         .join(" ");
-      status.tooltip = res.stdout;
+
+      status.tooltip = selectedBranch
+        ? res.stdout + `Comparing with: ${selectedBranch}`
+        : res.stdout;
+
       if (
         [
           res.modifiedFileCount,
