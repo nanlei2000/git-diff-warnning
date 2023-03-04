@@ -3,6 +3,7 @@ import { QuickPickItem } from "vscode";
 import { getBranches, getCount } from "./core";
 
 const PRIORITIZED_BRANCHES = ["main", "master", "staging"];
+const COMPARE_WITHIN_COMMITS_LABEL = "Compare within commits";
 
 export function activate() {
   let selectedBranch: string | undefined = undefined;
@@ -23,9 +24,11 @@ export function activate() {
   watcher.onDidChange(() => {
     updateStatus(selectedBranch);
   });
+
   vscode.workspace.onDidChangeConfiguration(() => {
     updateStatus(selectedBranch);
   });
+
   updateStatus(selectedBranch);
 
   const getCountText = (count: number, maxCount: number): string => {
@@ -84,7 +87,7 @@ export function activate() {
 
       if (branch === "") {
         formattedBranches.push({
-          label: "Compare within commits",
+          label: COMPARE_WITHIN_COMMITS_LABEL,
           description: "Number of added and deleted lines.",
           detail: "Show changes between commits",
         });
@@ -115,7 +118,9 @@ export function activate() {
 
     // vs code show message
     vscode.window.showInformationMessage(
-      `Now comparing diff with branch: "${selectedBranch}"`
+      selectedBranch === COMPARE_WITHIN_COMMITS_LABEL
+        ? `Now comparing diff within commits`
+        : `Now comparing diff with branch: "${selectedBranch}"`
     );
   });
 
@@ -124,7 +129,14 @@ export function activate() {
 
   async function updateStatus(selectedBranch?: string): Promise<void> {
     const maxCountEachType = getMaxCountFromConfig();
-    const res = await getCount({ rootPath, selectedBranch });
+    const res = await getCount({
+      rootPath,
+      selectedBranch:
+        selectedBranch === COMPARE_WITHIN_COMMITS_LABEL
+          ? undefined
+          : selectedBranch,
+    });
+
     if (res) {
       status.text = (
         [
@@ -161,7 +173,22 @@ export function activate() {
       }
       status.show();
     } else {
-      status.hide();
+      // we want to trigger click command so we need to always show status bar
+      status.color = "unset";
+      if (selectedBranch) {
+        status.text = (
+          [
+            ["$(file)", 0],
+            ["$(diff-added)", 0],
+            ["$(diff-removed)", 0],
+          ] as const
+        )
+          .map((v, i) => `${v[0]} ${getCountText(v[1], maxCountEachType[i])}`)
+          .join(" ");
+      } else {
+        status.text = "Select branch";
+      }
+      status.show();
       console.warn(`Can't get diff result`);
     }
   }
