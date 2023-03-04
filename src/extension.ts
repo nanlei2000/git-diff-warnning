@@ -127,14 +127,16 @@ export function activate() {
   // click status bar to show quick pick
   status.command = "git-diff.branchSearch";
 
-  async function updateStatus(selectedBranch?: string): Promise<void> {
+  async function updateStatus(_selectedBranch?: string): Promise<void> {
+    const selectedBranch =
+      _selectedBranch === COMPARE_WITHIN_COMMITS_LABEL
+        ? undefined
+        : _selectedBranch;
+
     const maxCountEachType = getMaxCountFromConfig();
     const res = await getCount({
       rootPath,
-      selectedBranch:
-        selectedBranch === COMPARE_WITHIN_COMMITS_LABEL
-          ? undefined
-          : selectedBranch,
+      selectedBranch,
     });
 
     if (res) {
@@ -148,9 +150,9 @@ export function activate() {
         .map((v, i) => `${v[0]} ${getCountText(v[1], maxCountEachType[i])}`)
         .join(" ");
 
-      status.tooltip = selectedBranch
-        ? res.stdout + `Comparing with: ${selectedBranch}`
-        : res.stdout + `Comparing with: commits`;
+      status.tooltip = !selectedBranch
+        ? res.stdout + `Comparing with: commits`
+        : res.stdout + `Comparing with: ${selectedBranch}`;
 
       if (
         [
