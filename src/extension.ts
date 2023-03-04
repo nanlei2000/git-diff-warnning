@@ -177,7 +177,7 @@ export function activate() {
     } else {
       // we want to trigger click command so we need to always show status bar
       status.color = "unset";
-      if (selectedBranch) {
+      if (_selectedBranch) {
         status.text = (
           [
             ["$(file)", 0],
