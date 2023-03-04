@@ -105,10 +105,7 @@ export function activate() {
     });
 
     const _selectedBranch = await vscode.window.showQuickPick(
-      formattedBranches,
-      {
-        matchOnDetail: true,
-      }
+      formattedBranches
     );
 
     if (_selectedBranch == null) return;
