@@ -25,12 +25,22 @@ export async function getBranches(path: string): Promise<string[] | undefined> {
   }
 }
 
-export async function getCount(path: string): Promise<ParsedRes | undefined> {
+export async function getCount({
+  rootPath,
+  selectedBranch,
+}: {
+  rootPath: string;
+  selectedBranch?: string;
+}): Promise<ParsedRes | undefined> {
   try {
-    const cmd = `git diff --shortstat`;
+    const cmd = selectedBranch
+      ? `git diff --shortstat ${selectedBranch}`
+      : `git diff --shortstat`;
+
     const { stdout } = await exec(cmd, {
-      cwd: path,
+      cwd: rootPath,
     });
+
     // https://github.com/git/git/blob/108b97dc372828f0e72e56bbb40cae8e1e83ece6/diff.c#L2588
     // 1 file changed, 1 deletion(-)
     if (!stdout) {

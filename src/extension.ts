@@ -17,12 +17,12 @@ export function activate() {
   let isNeedWarn: boolean = false;
 
   watcher.onDidChange(() => {
-    updateStatus();
+    updateStatus(selectedBranch);
   });
   vscode.workspace.onDidChangeConfiguration(() => {
-    updateStatus();
+    updateStatus(selectedBranch);
   });
-  updateStatus();
+  updateStatus(selectedBranch);
 
   const getCountText = (count: number, maxCount: number): string => {
     if (maxCount < count) {
@@ -63,11 +63,12 @@ export function activate() {
     if (_selectedBranch == null) return;
 
     selectedBranch = _selectedBranch.label;
+    await updateStatus(_selectedBranch.label);
   });
 
-  async function updateStatus(): Promise<void> {
+  async function updateStatus(selectedBranch?: string): Promise<void> {
     const maxCountEachType = getMaxCountFromConfig();
-    const res = await getCount(rootPath);
+    const res = await getCount({ rootPath, selectedBranch });
     if (res) {
       status.text = (
         [
