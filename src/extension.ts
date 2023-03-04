@@ -1,5 +1,9 @@
 import * as vscode from "vscode";
+import { QuickPickItem } from "vscode";
 import { getBranches, getCount } from "./core";
+
+const PRIORITIZED_BRANCHES = ["main", "master", "staging"];
+
 export function activate() {
   let selectedBranch: string | undefined = undefined;
 
@@ -45,25 +49,74 @@ export function activate() {
   vscode.commands.registerCommand("git-diff.branchSearch", async function () {
     const branches = await getBranches(rootPath);
 
-    // format branches to quickPickItems
-    const quickPickItems = branches
-      ? branches.map((branch) => {
-          return {
-            label: branch,
-            description: "branch",
-            detail: branch,
-          };
-        })
-      : [];
+    if (branches == null || branches.length === 0) {
+      vscode.window.showErrorMessage("Can't get branches");
+      return;
+    }
 
-    const _selectedBranch = await vscode.window.showQuickPick(quickPickItems, {
-      matchOnDetail: true,
+    const formattedBranches: QuickPickItem[] = [];
+
+    let currentBranch: string | undefined = undefined;
+    // current branch
+    const _currentBranch = branches.find((branch) => branch.startsWith("* "));
+    if (_currentBranch) {
+      currentBranch = _currentBranch.replace("* ", "");
+    }
+
+    const sortedBranches = branches.sort((a) => {
+      if (a === "") {
+        return -1;
+      }
+
+      if (PRIORITIZED_BRANCHES.includes(a)) {
+        return -1;
+      }
+
+      return 0;
     });
+
+    // format branches to quickPickItems
+    sortedBranches.forEach((branch) => {
+      // remove current branch
+      if (branch.startsWith("*")) {
+        return;
+      }
+
+      if (branch === "") {
+        formattedBranches.push({
+          label: "Compare within commits",
+          description: "Number of added and deleted lines.",
+          detail: "Show changes between commits",
+        });
+        return;
+      }
+
+      // add branch to quickPickItems
+      formattedBranches.push({
+        label: branch,
+        description: branch,
+        detail: currentBranch
+          ? `Select ${branch} to compare with "${currentBranch}"`
+          : `Select ${branch} to compare`,
+      });
+    });
+
+    const _selectedBranch = await vscode.window.showQuickPick(
+      formattedBranches,
+      {
+        matchOnDetail: true,
+      }
+    );
 
     if (_selectedBranch == null) return;
 
     selectedBranch = _selectedBranch.label;
     await updateStatus(_selectedBranch.label);
+
+    // vs code show message
+    vscode.window.showInformationMessage(
+      `Now comparing diff with branch: "${selectedBranch}"`
+    );
   });
 
   // click status bar to show quick pick
@@ -85,7 +138,7 @@ export function activate() {
 
       status.tooltip = selectedBranch
         ? res.stdout + `Comparing with: ${selectedBranch}`
-        : res.stdout;
+        : res.stdout + `Comparing with: commits`;
 
       if (
         [
