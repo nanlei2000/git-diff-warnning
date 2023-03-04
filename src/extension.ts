@@ -163,9 +163,7 @@ export function activate() {
         ].some((v, index) => v > maxCountEachType[index])
       ) {
         if (isNeedWarn === false) {
-          vscode.window.showWarningMessage(
-            "WARNING: git diff too big, consider to commit"
-          );
+          vscode.window.showWarningMessage("WARNING: git diff too big.");
         }
         isNeedWarn = true;
         status.color = "#f00";
