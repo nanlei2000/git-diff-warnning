@@ -1,5 +1,5 @@
-import child_process = require('child_process');
-import util = require('util');
+import child_process = require("child_process");
+import util = require("util");
 const exec = util.promisify(child_process.exec);
 type ParsedRes = {
   stdout: string;
@@ -7,6 +7,23 @@ type ParsedRes = {
   insertCount: number;
   deleteCount: number;
 };
+
+// get all branches list
+export async function getBranches(path: string): Promise<string[] | undefined> {
+  try {
+    // get all branches
+    const { stdout } = await exec("git branch", {
+      cwd: path,
+    });
+
+    // convert stdout to array
+    const branches = stdout.split("\n").map((branch) => branch.trim());
+
+    return branches;
+  } catch (error) {
+    return undefined;
+  }
+}
 
 export async function getCount(path: string): Promise<ParsedRes | undefined> {
   try {
