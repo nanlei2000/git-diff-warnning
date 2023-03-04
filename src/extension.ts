@@ -66,6 +66,9 @@ export function activate() {
     await updateStatus(_selectedBranch.label);
   });
 
+  // click status bar to show quick pick
+  status.command = "git-diff.branchSearch";
+
   async function updateStatus(selectedBranch?: string): Promise<void> {
     const maxCountEachType = getMaxCountFromConfig();
     const res = await getCount({ rootPath, selectedBranch });
