@@ -1,62 +1,68 @@
 {
-    "name": "git-diff-warning",
-    "displayName": "Git Diff Warning",
-    "description": "Warn if git diff line count is too big",
-    "publisher": "nanlei2000",
-    "version": "1.0.2",
-    "engines": {
-        "vscode": "^1.39.0"
-    },
-    "categories": [
-        "Other"
+  "name": "git-diff-warning",
+  "displayName": "Git Diff Warning",
+  "description": "Warn if git diff line count is too big",
+  "publisher": "nanlei2000",
+  "version": "1.0.2",
+  "engines": {
+    "vscode": "^1.39.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:.git"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "git-diff.branchSearch",
+        "title": "Git diff: Select branch to compare"
+      }
     ],
-    "activationEvents": [
-        "workspaceContains:.git"
-    ],
-    "main": "./out/extension.js",
-    "contributes": {
-        "configuration": [
-            {
-                "title": "Git Diff Warning Configuration",
-                "properties": {
-                    "gitDiffWarning.maxCountEachTypeAndSum": {
-                        "type": "array",
-                        "default": [
-                            null,
-                            200,
-                            200,
-                            200
-                        ],
-                        "description": "Max counts for 'changed files','insertions','deletions',and 'insertions deletions sum'.Set `null` to ignore specific one."
-                    }
-                }
-            }
-        ]
-    },
-    "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "pretest": "npm run compile",
-        "test": "node ./out/test/runTest.js"
-    },
-    "devDependencies": {
-        "@types/glob": "^7.1.1",
-        "@types/mocha": "^5.2.6",
-        "@types/node": "^10.12.21",
-        "@types/vscode": "^1.39.0",
-        "glob": "^7.1.4",
-        "mocha": "^6.1.4",
-        "typescript": "^3.3.1",
-        "tslint": "^5.12.1",
-        "vscode-test": "^1.2.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/nanlei2000/git-diff-warnning"
-    },
-    "bugs": {
-        "url": "https://github.com/nanlei2000/git-diff-warnning/issues"
-    },
-    "icon": "media/icon.png"
+    "configuration": [
+      {
+        "title": "Git Diff Warning Configuration",
+        "properties": {
+          "gitDiffWarning.maxCountEachTypeAndSum": {
+            "type": "array",
+            "default": [
+              null,
+              200,
+              200,
+              200
+            ],
+            "description": "Max counts for 'changed files','insertions','deletions',and 'insertions deletions sum'.Set `null` to ignore specific one."
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.1",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^10.12.21",
+    "@types/vscode": "^1.39.0",
+    "glob": "^7.1.4",
+    "mocha": "^6.1.4",
+    "typescript": "^3.3.1",
+    "tslint": "^5.12.1",
+    "vscode-test": "^1.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nanlei2000/git-diff-warnning"
+  },
+  "bugs": {
+    "url": "https://github.com/nanlei2000/git-diff-warnning/issues"
+  },
+  "icon": "media/icon.png"
 }
