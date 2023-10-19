@@ -1,5 +1,5 @@
-import child_process = require('child_process');
-import util = require('util');
+import child_process = require("child_process");
+import util = require("util");
 const exec = util.promisify(child_process.exec);
 type ParsedRes = {
   stdout: string;
@@ -8,9 +8,12 @@ type ParsedRes = {
   deleteCount: number;
 };
 
-export async function getCount(path: string): Promise<ParsedRes | undefined> {
+export async function getCount(
+  path: string,
+  baseReference: string
+): Promise<ParsedRes | undefined> {
   try {
-    const cmd = `git diff --shortstat`;
+    const cmd = `git diff --shortstat ${baseReference}`;
     const { stdout } = await exec(cmd, {
       cwd: path,
     });

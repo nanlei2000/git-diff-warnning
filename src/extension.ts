@@ -1,5 +1,5 @@
-import * as vscode from 'vscode';
-import { getCount } from './core';
+import * as vscode from "vscode";
+import { getCount } from "./core";
 export function activate() {
   const status = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left,
@@ -10,7 +10,7 @@ export function activate() {
     return;
   }
   const rootPath = folders[0].uri.path;
-  const pattern = new vscode.RelativePattern(rootPath, '**/*');
+  const pattern = new vscode.RelativePattern(rootPath, "**/*");
   const watcher = vscode.workspace.createFileSystemWatcher(pattern);
   let isNeedWarn: boolean = false;
 
@@ -24,32 +24,36 @@ export function activate() {
 
   const getCountText = (count: number, maxCount: number): string => {
     if (maxCount < count) {
-      return count + '!';
+      return count + "!";
     } else {
-      return count + '';
+      return count + "";
     }
   };
 
   type MaxCountsConfig = [number, number, number, number];
   function getMaxCountFromConfig(): MaxCountsConfig {
-    let config = vscode.workspace.getConfiguration('gitDiffWarning');
+    let config = vscode.workspace.getConfiguration("gitDiffWarning");
     const maxCountEachType = config
-      .get<(number | null)[]>('maxCountEachTypeAndSum')!
-      .map(v => (v !== null ? +v : Infinity));
+      .get<(number | null)[]>("maxCountEachTypeAndSum")!
+      .map((v) => (v !== null ? +v : Infinity));
     return maxCountEachType as MaxCountsConfig;
   }
 
   async function updateStatus(): Promise<void> {
     const maxCountEachType = getMaxCountFromConfig();
-    const res = await getCount(rootPath);
+    let config = vscode.workspace.getConfiguration("gitDiffWarning");
+    const baseReference = config.get<string>("baseReference") || "HEAD";
+    const res = await getCount(rootPath, baseReference);
     if (res) {
-      status.text = ([
-        ['$(file)', res.modifiedFileCount],
-        ['$(diff-added)', res.insertCount],
-        ['$(diff-removed)', res.deleteCount],
-      ] as const)
+      status.text = (
+        [
+          ["$(file)", res.modifiedFileCount],
+          ["$(diff-added)", res.insertCount],
+          ["$(diff-removed)", res.deleteCount],
+        ] as const
+      )
         .map((v, i) => `${v[0]} ${getCountText(v[1], maxCountEachType[i])}`)
-        .join(' ');
+        .join(" ");
       status.tooltip = res.stdout;
       if (
         [
@@ -61,14 +65,14 @@ export function activate() {
       ) {
         if (isNeedWarn === false) {
           vscode.window.showWarningMessage(
-            'WARNING: git diff too big, consider to commit'
+            "WARNING: git diff too big, consider to commit"
           );
         }
         isNeedWarn = true;
-        status.color = '#f00';
+        status.color = "#f00";
       } else {
         isNeedWarn = false;
-        status.color = 'unset';
+        status.color = "unset";
       }
       status.show();
     } else {
